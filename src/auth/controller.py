@@ -6,7 +6,6 @@ from fastapi import APIRouter, HTTPException
 from auth.dto import TokensCreateResponseDTO, AuthRequestDTO, AuthRefreshTokenDTO
 
 auth_router = APIRouter(
-    prefix="/api",
     tags=["Авторизация пользователя"],
 )
 

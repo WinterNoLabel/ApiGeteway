@@ -7,7 +7,6 @@ from dependency.current_user import get_user_from_token
 from personal_account.dto import PersonalAccountResponse
 
 pa_router = APIRouter(
-    prefix="/api",
     tags=["Личный кабинет пользователя"],
 )
 

@@ -19,6 +19,7 @@ app = FastAPI(
     description="API Gateway",
     version="0.1.0",
     docs_url="/docs",
+    root_path="/api",
     redoc_url="/redoc",
     openapi_url="/openapi.json"
 )
