@@ -6,6 +6,8 @@ services:
       dockerfile: ./Dockerfile
     restart: always
     command: sh /app/utils/start_api.sh
+    ports:
+      - "8000:8000"
     networks:
       - my_network
 
