@@ -1,0 +1,16 @@
+services:
+  api_gateway:
+    container_name: api_gateway
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: always
+    command: sh /app/utils/start_api.sh
+    networks:
+      - my_network
+
+
+networks:
+  my_network:
+    name: my_network
+    driver: bridge
