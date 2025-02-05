@@ -3,6 +3,7 @@ from starlette.middleware import Middleware
 from fastapi.middleware.cors import CORSMiddleware
 from auth.controller import auth_router
 from personal_account.controller import pa_router
+from community.controller import c_router
 
 middleware = [
     Middleware(
@@ -26,3 +27,4 @@ app = FastAPI(
 
 app.include_router(auth_router)
 app.include_router(pa_router)
+app.include_router(c_router)
