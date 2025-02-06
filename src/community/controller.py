@@ -1,11 +1,10 @@
 import json
-from urllib import response
-
 import aiohttp
 from fastapi import APIRouter, HTTPException, Depends, Query
 from starlette import status
 from community.dto import CommunityResponseDTO, CommunityRequestDTO, CommunityRequestToServiceDTO, \
-    CreateRoleResponseToServiceDTO, CreateRoleRequestDTO, CommunityResponseToServiceDTO, PermissionResponseToServiceDTO
+    CreateRoleResponseToServiceDTO, CreateRoleRequestDTO, CommunityResponseToServiceDTO, PermissionResponseToServiceDTO, \
+    RevokeAndAssignRoleRequestDTO, CommunityLocationResponseDTO
 from dependency.current_user import get_user_from_token
 from typing import Annotated, List
 
@@ -156,3 +155,161 @@ async def create_community_role_send_request_to_service(community_id: int,
                 ) for permission in response.get("permissions")]
             )
 
+
+@c_router.post(
+    "/community/{community_id}/roles/revoke",
+    summary="Отозвать роль у пользователя",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def revoke_role_send_request_to_service(current_user: Annotated[dict, Depends(get_user_from_token)],
+                                              community_id: int,
+                                              data: RevokeAndAssignRoleRequestDTO):
+    user_id = current_user.get("id")
+    headers = {
+        "Content-Type": "application/json",
+    }
+
+    async with aiohttp.ClientSession() as session:
+        async with session.post(
+            url=f"https://2046-185-26-96-103.ngrok-free.app/community/{community_id}/roles/revoke?userId={user_id}",
+            headers=headers,
+            ssl=False,
+            data=json.dumps(data.dict()),
+        ) as response:
+            if response.status == 403 or response.status == 404:
+                raise HTTPException(
+                    status_code=response.status,
+                    detail="Недостаточно прав" if response.status == 403 else "Связь не найдена"
+                )
+
+
+@c_router.post(
+    "/community/{community_id}/roles/assign",
+    status_code=status.HTTP_200_OK,
+    summary="Назначить роль пользователю",
+
+)
+async def assign_role_send_request_to_service(current_user: Annotated[dict, Depends(get_user_from_token)],
+                                              community_id: int,
+                                              data: RevokeAndAssignRoleRequestDTO):
+
+    user_id = current_user.get("id")
+    headers = {
+        "Content-Type": "application/json",
+    }
+
+    async with aiohttp.ClientSession() as session:
+        async with session.post(
+                url=f"https://2046-185-26-96-103.ngrok-free.app/community/{community_id}/roles/assign?userId={user_id}",
+                headers=headers,
+                ssl=False,
+                data=json.dumps(data.dict()),
+        ) as response:
+            if response.status == 403 or response.status == 404:
+                raise HTTPException(
+                    status_code=response.status,
+                    detail="Недостаточно прав" if response.status == 403 else "Связь не найдена"
+                )
+            if response.status == 409:
+                raise HTTPException(
+                    status_code=response.status,
+                    detail="Роль уже назначена пользователю"
+                )
+
+
+@c_router.post(
+    "/community/{community_id}/roles/{role_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Удалить роль"
+)
+async def delete_role_send_request_to_service(community_id: int,
+                                              role_id: int,
+                                              current_user: Annotated[dict, Depends(get_user_from_token)]):
+    user_id = current_user.get("id")
+    headers = {
+        "Content-Type": "application/json",
+    }
+    async with aiohttp.ClientSession() as session:
+        async with session.delete(
+            url=f"https://2046-185-26-96-103.ngrok-free.app/community/{community_id}/roles/{role_id}?userId={user_id}",
+            headers=headers,
+            ssl=False,
+        ) as response:
+            if response.status == 403 or response.status == 404:
+                raise HTTPException(
+                    status_code=response.status,
+                    detail="Недостаточно прав" if response.status == 403 else "Роль не найдена"
+                )
+
+
+@c_router.post(
+    "/community-location",
+    status_code=status.HTTP_200_OK,
+    summary="Привязать сообщество к местоположению",
+    response_model=CommunityLocationResponseDTO
+)
+async def community_location_send_request_to_service(current_user: Annotated[dict, Depends(get_user_from_token)]):
+    user_id = current_user.get("id")
+    headers = {
+        "Content-Type": "application/json",
+    }
+
+    async with aiohttp.ClientSession() as session:
+        async with session.post(
+            url="https://2046-185-26-96-103.ngrok-free.app/community-location",
+            headers=headers,
+            ssl=False,
+        ) as response:
+            if response.status == 400:
+                raise HTTPException(
+                    status_code=response.status,
+                    detail="Ошибка валидации"
+                )
+
+            response = await response.json()
+
+            return CommunityLocationResponseDTO(
+                id=response.get("id"),
+                locationType=response.get("locationType"),
+                locationId=response.get("locationId"),
+                communityId=response.get("communityId"),
+            )
+
+@c_router.get(
+    "/community-location/{community_id}",
+    summary="Поиск местоположение сообщества по ID",
+    status_code=status.HTTP_200_OK,
+    response_model=CommunityLocationResponseDTO
+)
+async def get_community_location_send_request_to_service(community_id: int,
+                                                         current_user: Annotated[dict, Depends(get_user_from_token)]):
+    user_id = current_user.get("id")
+    headers = {
+        "Content-Type": "application/json",
+    }
+    async with aiohttp.ClientSession() as session:
+        async with session.get(
+            url=f"https://2046-185-26-96-103.ngrok-free.app//community-location/{community_id}",
+            headers=headers,
+            ssl=False,
+        ) as response:
+
+            if response.status == 404:
+                raise HTTPException(
+                    status_code=response.status,
+                    detail="Не найдено по данному ID"
+                )
+            response = await response.json()
+            return CommunityLocationResponseDTO(
+                id=response.get("id"),
+                locationType=response.get("locationType"),
+                locationId=response.get("locationId"),
+                communityId=response.get("communityId"),
+            )
+
+# @c_router.get(
+#     "/community/{community_id}/events",
+#     summary="Получить список событий",
+#     status_code=status.HTTP_200_OK,
+#     response_model=CommunityLocationResponseDTO
+# )

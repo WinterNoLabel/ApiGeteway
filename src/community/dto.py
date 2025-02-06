@@ -86,3 +86,40 @@ class CreateRoleResponseToServiceDTO(BaseModel):
     permissions: List[PermissionResponseToServiceDTO] = Field(
         ..., description="Права пользователя"
     )
+
+
+class RevokeAndAssignRoleRequestDTO(BaseModel):
+    targetUserId: int = Field(
+        ..., description="ID пользователя"
+    )
+    roleId: int = Field(
+        ..., description="ID роли"
+    )
+
+
+class CommunityLocationRequestDTO(BaseModel):
+    locationType: str = Field(
+        ..., description="Тип локации"
+    )
+    locationId: int = Field(
+        ..., description="ID локации"
+    )
+    communityId: int = Field(
+        ..., description="ID сообщества"
+    )
+
+class CommunityLocationResponseDTO(BaseModel):
+    id: int = Field(
+        ..., description="Уникальный идентификатор"
+    )
+    locationType: str = Field(
+        ..., description="Тип локации"
+    )
+    locationId: int = Field(
+        ..., description="ID локации"
+    )
+    communityId: int = Field(
+        ..., description="ID сообщества"
+    )
+
+class CommunityEventsResponseDTO(BaseModel):

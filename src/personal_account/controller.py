@@ -5,6 +5,7 @@ from starlette import status
 from fastapi import APIRouter, HTTPException, Depends, Form, UploadFile, File
 from dependency.current_user import get_user_from_token
 from personal_account.dto import PersonalAccountResponse
+from core.settings import settings
 
 pa_router = APIRouter(
     tags=["Личный кабинет пользователя"],
@@ -21,7 +22,7 @@ async def send_request_to_profile_service(current_user: Annotated[dict, Depends(
     headers = {"Content-Type": "application/json"}
 
     async with (aiohttp.ClientSession() as session):
-        async with session.get(url=f"http://127.0.0.1:8080/profile?userID={user_id}",
+        async with session.get(url=f"http:/{settings.auth_service_settings.base_url}:{settings.auth_service_settings.port}/profile?userID={user_id}",
                                 headers=headers, ssl=False) as response:
             response = await response.json()
 
@@ -63,7 +64,7 @@ async def send_request_to_profile_service_for_partial_update(current_user: Annot
         form_data.add_field("photo", photo.file, filename=photo.filename, content_type=photo.content_type)
 
     async with aiohttp.ClientSession() as session:
-        async with session.patch(url=f"http://127.0.0.1:8080/profile", data=form_data, ssl=False) as response:
+        async with session.patch(url=f"http://{settings.auth_service_settings.base_url}:{settings.auth_service_settings.port}/profile", data=form_data, ssl=False) as response:
             if response.status != 200:
                 raise HTTPException(
                     status_code=response.status,

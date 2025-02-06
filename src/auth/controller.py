@@ -4,6 +4,7 @@ from starlette import status
 import aiohttp
 from fastapi import APIRouter, HTTPException
 from auth.dto import TokensCreateResponseDTO, AuthRequestDTO, AuthRefreshTokenDTO
+from core.settings import settings
 
 auth_router = APIRouter(
     tags=["Авторизация пользователя"],
@@ -20,7 +21,7 @@ async def send_request_to_auth_service(data: AuthRequestDTO):
     headers = {"Content-Type": "application/json"}
 
     async with aiohttp.ClientSession() as session:
-        async with session.post(url="http://127.0.0.1:8001/auth", headers=headers, data=json_data, ssl=False) as response:
+        async with session.post(url=f"http://{settings.auth_service_settings.base_url}:{settings.auth_service_settings.port}/auth", headers=headers, data=json_data, ssl=False) as response:
 
             if response.status != 200:
                 raise HTTPException(
@@ -41,7 +42,7 @@ async def send_request_to_refresh_token(data: AuthRefreshTokenDTO):
 
     async with aiohttp.ClientSession() as session:
         headers = {"Content-Type": "application/json"}
-        async with session.post(url="http://127.0.0.1:8000/refresh_token", headers=headers, data=json_data, ssl=False) as response:
+        async with session.post(url=f"http://{settings.auth_service_settings.base_url}:{settings.auth_service_settings.port}/refresh_token", headers=headers, data=json_data, ssl=False) as response:
 
             if response.status != 200:
                 raise HTTPException(
