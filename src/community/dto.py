@@ -122,4 +122,4 @@ class CommunityLocationResponseDTO(BaseModel):
         ..., description="ID сообщества"
     )
 
-class CommunityEventsResponseDTO(BaseModel):
+# class CommunityEventsResponseDTO(BaseModel):
