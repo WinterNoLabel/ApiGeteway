@@ -26,7 +26,7 @@ async def search_community_send_request_to_service(current_user: Annotated[dict,
                                                    name: str = Query(None, description="Имя сообщества"),
                                                    description: str = Query(None, description="Описание сообщества")):
     user_id = current_user.get("id")
-    url = f"https://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community"
+    url = f"http://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community"
     headers = {
         "Content-Type": "application/json",
     }
@@ -76,7 +76,7 @@ async def create_community_send_request_to_service(current_user: Annotated[dict,
                                                    data: CommunityRequestDTO):
     user_id = current_user.get("id")
 
-    url = f"https://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community"
+    url = f"http://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community"
     headers = {
         "Content-Type": "application/json",
     }
@@ -119,7 +119,7 @@ async def create_community_role_send_request_to_service(community_id: int,
                                                         data: CreateRoleRequestDTO):
     user_id = current_user.get("id")
 
-    url = f"https://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community/{community_id}/roles?userId={user_id}"
+    url = f"http://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community/{community_id}/roles?userId={user_id}"
 
     headers = {
         "Content-Type": "application/json",
@@ -172,7 +172,7 @@ async def revoke_role_send_request_to_service(current_user: Annotated[dict, Depe
 
     async with aiohttp.ClientSession() as session:
         async with session.post(
-            url=f"https://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community/{community_id}/roles/revoke?userId={user_id}",
+            url=f"http://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community/{community_id}/roles/revoke?userId={user_id}",
             headers=headers,
             ssl=False,
             data=json.dumps(data.dict()),
@@ -201,7 +201,7 @@ async def assign_role_send_request_to_service(current_user: Annotated[dict, Depe
 
     async with aiohttp.ClientSession() as session:
         async with session.post(
-                url=f"https://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community/{community_id}/roles/assign?userId={user_id}",
+                url=f"http://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community/{community_id}/roles/assign?userId={user_id}",
                 headers=headers,
                 ssl=False,
                 data=json.dumps(data.dict()),
@@ -232,7 +232,7 @@ async def delete_role_send_request_to_service(community_id: int,
     }
     async with aiohttp.ClientSession() as session:
         async with session.delete(
-            url=f"https://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community/{community_id}/roles/{role_id}?userId={user_id}",
+            url=f"http://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community/{community_id}/roles/{role_id}?userId={user_id}",
             headers=headers,
             ssl=False,
         ) as response:
@@ -257,7 +257,7 @@ async def community_location_send_request_to_service(current_user: Annotated[dic
 
     async with aiohttp.ClientSession() as session:
         async with session.post(
-            url=f"https://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community-location",
+            url=f"http://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community-location",
             headers=headers,
             ssl=False,
         ) as response:
@@ -290,7 +290,7 @@ async def get_community_location_send_request_to_service(community_id: int,
     }
     async with aiohttp.ClientSession() as session:
         async with session.get(
-            url=f"https://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community-location/{community_id}",
+            url=f"http://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community-location/{community_id}",
             headers=headers,
             ssl=False,
         ) as response:
