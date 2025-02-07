@@ -1,5 +1,6 @@
 import re
 
+from fastapi import HTTPException
 from pydantic import BaseModel, Field, field_validator, ValidationError
 
 
@@ -12,7 +13,8 @@ class AuthRequestDTO(BaseModel):
     def validate_phone_number(cls, v):
         # Проверка на соответствие формату +7 и наличие 11 цифр
         if not re.fullmatch(r'^\+7\d{10}$', v):
-            raise ValidationError('Номер телефона должен начинаться с +7 и содержать 11 цифр')
+            raise HTTPException(detail='Номер телефона должен начинаться с +7 и содержать 11 цифр',
+                                status_code=400)
         return v
 
 
