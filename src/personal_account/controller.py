@@ -25,7 +25,7 @@ async def send_request_to_profile_service(current_user: Annotated[dict, Depends(
     params["userID"] = user_id
 
     async with (aiohttp.ClientSession() as session):
-        async with session.get(url=f"http://127.0.0.1:8080/profile",
+        async with session.get(url=f"http://{settings.personal_account_service_settings.base_url}:{settings.personal_account_service_settings.port}/profile",
                                 headers=headers, params=params, ssl=False) as response:
             if response.status == 404:
                 raise HTTPException(
