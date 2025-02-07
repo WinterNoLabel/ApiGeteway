@@ -21,21 +21,25 @@ async def send_request_to_profile_service(current_user: Annotated[dict, Depends(
     user_id = current_user.get("id")
     headers = {"Content-Type": "application/json"}
 
-    async with (aiohttp.ClientSession() as session):
-        async with session.get(url=f"http://{settings.auth_service_settings.base_url}:{settings.auth_service_settings.port}/profile?userID={user_id}",
-                                headers=headers, ssl=False) as response:
-            response = await response.json()
+    params = {}
+    params["userID"] = user_id
 
-            if response.get("status"):
+    async with (aiohttp.ClientSession() as session):
+        async with session.get(url=f"http://127.0.0.1:8080/profile",
+                                headers=headers, params=params, ssl=False) as response:
+            if response.status == 404:
                 raise HTTPException(
-                    status_code=response.get("status"),
-                    detail=response.get("detail"),
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail=response.reason,
                 )
+
+
+            response = await response.json()
 
             return PersonalAccountResponse(
                 id=response.get("id"),
                 username=response.get("username"),
-                first_name=response.get("firstName"),
+                first_name=response.get("firstName") if response.get("firstName") else None,
                 photo_url=response.get("photoUrl"),
             )
 
