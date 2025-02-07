@@ -5,6 +5,7 @@ from starlette import status
 from community.dto import CommunityResponseDTO, CommunityRequestDTO, CommunityRequestToServiceDTO, \
     CreateRoleResponseToServiceDTO, CreateRoleRequestDTO, CommunityResponseToServiceDTO, PermissionResponseToServiceDTO, \
     RevokeAndAssignRoleRequestDTO, CommunityLocationResponseDTO
+from core.settings import settings
 from dependency.current_user import get_user_from_token
 from typing import Annotated, List
 
@@ -25,7 +26,7 @@ async def search_community_send_request_to_service(current_user: Annotated[dict,
                                                    name: str = Query(None, description="Имя сообщества"),
                                                    description: str = Query(None, description="Описание сообщества")):
     user_id = current_user.get("id")
-    url = "https://2046-185-26-96-103.ngrok-free.app/community"
+    url = f"https://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community"
     headers = {
         "Content-Type": "application/json",
     }
@@ -75,7 +76,7 @@ async def create_community_send_request_to_service(current_user: Annotated[dict,
                                                    data: CommunityRequestDTO):
     user_id = current_user.get("id")
 
-    url = "https://2046-185-26-96-103.ngrok-free.app/community"
+    url = f"https://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community"
     headers = {
         "Content-Type": "application/json",
     }
@@ -118,7 +119,7 @@ async def create_community_role_send_request_to_service(community_id: int,
                                                         data: CreateRoleRequestDTO):
     user_id = current_user.get("id")
 
-    url = f"https://2046-185-26-96-103.ngrok-free.app/community/{community_id}/roles?userId={user_id}"
+    url = f"https://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community/{community_id}/roles?userId={user_id}"
 
     headers = {
         "Content-Type": "application/json",
@@ -171,7 +172,7 @@ async def revoke_role_send_request_to_service(current_user: Annotated[dict, Depe
 
     async with aiohttp.ClientSession() as session:
         async with session.post(
-            url=f"https://2046-185-26-96-103.ngrok-free.app/community/{community_id}/roles/revoke?userId={user_id}",
+            url=f"https://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community/{community_id}/roles/revoke?userId={user_id}",
             headers=headers,
             ssl=False,
             data=json.dumps(data.dict()),
@@ -200,7 +201,7 @@ async def assign_role_send_request_to_service(current_user: Annotated[dict, Depe
 
     async with aiohttp.ClientSession() as session:
         async with session.post(
-                url=f"https://2046-185-26-96-103.ngrok-free.app/community/{community_id}/roles/assign?userId={user_id}",
+                url=f"https://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community/{community_id}/roles/assign?userId={user_id}",
                 headers=headers,
                 ssl=False,
                 data=json.dumps(data.dict()),
@@ -231,7 +232,7 @@ async def delete_role_send_request_to_service(community_id: int,
     }
     async with aiohttp.ClientSession() as session:
         async with session.delete(
-            url=f"https://2046-185-26-96-103.ngrok-free.app/community/{community_id}/roles/{role_id}?userId={user_id}",
+            url=f"https://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community/{community_id}/roles/{role_id}?userId={user_id}",
             headers=headers,
             ssl=False,
         ) as response:
@@ -256,7 +257,7 @@ async def community_location_send_request_to_service(current_user: Annotated[dic
 
     async with aiohttp.ClientSession() as session:
         async with session.post(
-            url="https://2046-185-26-96-103.ngrok-free.app/community-location",
+            url=f"https://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community-location",
             headers=headers,
             ssl=False,
         ) as response:
@@ -289,7 +290,7 @@ async def get_community_location_send_request_to_service(community_id: int,
     }
     async with aiohttp.ClientSession() as session:
         async with session.get(
-            url=f"https://2046-185-26-96-103.ngrok-free.app//community-location/{community_id}",
+            url=f"https://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community-location/{community_id}",
             headers=headers,
             ssl=False,
         ) as response:

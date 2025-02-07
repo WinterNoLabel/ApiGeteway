@@ -28,10 +28,17 @@ class PersonalAccountServiceSettings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding='utf-8', extra='ignore')
 
 
+class CommunityServiceSettings(BaseSettings):
+    base_url: str = Field(..., validation_alias='COMMUNITY_BASE_URL')
+    port: int = Field(..., validation_alias='COMMUNITY_PORT')
+
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding='utf-8', extra='ignore')
+
 class Settings(BaseSettings):
     jwt_settings: JWTSettings = JWTSettings()
     auth_service_settings: AuthServiceSettings = AuthServiceSettings()
     personal_account_service_settings: PersonalAccountServiceSettings = PersonalAccountServiceSettings()
+    community_service_settings: CommunityServiceSettings = CommunityServiceSettings()
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding='utf-8', extra='ignore')
 
