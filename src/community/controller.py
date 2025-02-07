@@ -218,7 +218,7 @@ async def assign_role_send_request_to_service(current_user: Annotated[dict, Depe
                 )
 
 
-@c_router.post(
+@c_router.delete(
     "/community/{community_id}/roles/{role_id}",
     status_code=status.HTTP_204_NO_CONTENT,
     summary="Удалить роль"
@@ -369,6 +369,83 @@ async def post_community_events_send_request_to_service(community_id: int,
                     detail="Недостаточно прав"
                 )
 
+            response = await response.json()
+
+            return response
+
+
+@c_router.delete(
+    "/community/{community_id}/events/{event_id}",
+    summary="Удалить событие",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_community_events_send_request_to_service(community_id: int,
+                                                          event_id: int,
+                                                       current_user: Annotated[dict, Depends(get_user_from_token)]):
+    user_id = current_user.get("id")
+
+    headers = {
+        "Content-Type": "application/json",
+    }
+    params = {}
+
+    params["userId"] = user_id
+
+    async with aiohttp.ClientSession() as session:
+        async with session.delete(
+            url=f"http://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community/{community_id}/events/{event_id}",
+            headers=headers,
+            params=params,
+            ssl=False,
+        ) as response:
+            if response.status == 403:
+                raise HTTPException(
+                    status_code=response.status,
+                    detail="Недостаточно прав"
+                )
+
+
+@c_router.get(
+    "/permission",
+    summary="Список прав",
+    status_code=status.HTTP_200_OK,
+)
+async def get_permission_events_send_request_to_service(current_user: Annotated[dict, Depends(get_user_from_token)]):
+    user_id = current_user.get("id")
+
+    headers = {
+        "Content-Type": "application/json",
+    }
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(
+            url=f"http://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/permission",
+            headers=headers,
+            ssl=False,
+        ) as response:
+            response = await response.json()
+
+            return response
+
+
+@c_router.get(
+    "/community/{community_id}/members",
+    summary="Список прав",
+    status_code=status.HTTP_200_OK,
+)
+async def get_members_send_request_to_service(community_id: int, current_user: Annotated[dict, Depends(get_user_from_token)]):
+    user_id = current_user.get("id")
+
+    headers = {
+        "Content-Type": "application/json",
+    }
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(
+            url=f"http://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community/{community_id}/members",
+            headers=headers,
+            ssl=False,
+        ) as response:
             response = await response.json()
 
             return response
