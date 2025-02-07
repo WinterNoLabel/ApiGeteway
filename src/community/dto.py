@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional, List
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
+
 
 class CommunityResponseDTO(BaseModel):
     id: int = Field(
@@ -123,3 +124,16 @@ class CommunityLocationResponseDTO(BaseModel):
     )
 
 # class CommunityEventsResponseDTO(BaseModel):
+
+class CommunityEventRequestDTO(BaseModel):
+    name: str = Field(
+        ..., description="Имя"
+    )
+    description: str = Field(
+        ..., description="Описание"
+    )
+    eventDate: datetime = Field(
+        ..., description="Дата и время"
+    )
+
+    model_config = ConfigDict(json_encoders={datetime: lambda v: v.isoformat()})

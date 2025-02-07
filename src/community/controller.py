@@ -4,7 +4,7 @@ from fastapi import APIRouter, HTTPException, Depends, Query
 from starlette import status
 from community.dto import CommunityResponseDTO, CommunityRequestDTO, CommunityRequestToServiceDTO, \
     CreateRoleResponseToServiceDTO, CreateRoleRequestDTO, CommunityResponseToServiceDTO, PermissionResponseToServiceDTO, \
-    RevokeAndAssignRoleRequestDTO, CommunityLocationResponseDTO
+    RevokeAndAssignRoleRequestDTO, CommunityLocationResponseDTO, CommunityEventRequestDTO
 from core.settings import settings
 from dependency.current_user import get_user_from_token
 from typing import Annotated, List
@@ -97,7 +97,7 @@ async def create_community_send_request_to_service(current_user: Annotated[dict,
             if response.status != 200:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND,
-                    detail=response.content
+                    detail=response.reason,
                 )
 
             responses = await response.json()
@@ -308,9 +308,67 @@ async def get_community_location_send_request_to_service(community_id: int,
                 communityId=response.get("communityId"),
             )
 
-# @c_router.get(
-#     "/community/{community_id}/events",
-#     summary="Получить список событий",
-#     status_code=status.HTTP_200_OK,
-#     response_model=CommunityLocationResponseDTO
-# )
+@c_router.get(
+    "/community/{community_id}/events",
+    summary="Получить список событий",
+    status_code=status.HTTP_200_OK,
+    response_model=List[CommunityLocationResponseDTO]
+)
+async def get_community_events_send_request_to_service(community_id: int,
+                                                       current_user: Annotated[dict, Depends(get_user_from_token)]):
+    user_id = current_user.get("id")
+
+    headers = {
+        "Content-Type": "application/json",
+    }
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(
+            url=f"http://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community/{community_id}/events",
+            headers=headers,
+            ssl=False,
+        ) as response:
+            if response.status == 404:
+                raise HTTPException(
+                    status_code=response.status,
+                    detail="Not found"
+                )
+
+            response = await response.json()
+
+            return response
+
+@c_router.post(
+    "/community/{community_id}/events",
+    summary="Создать список событий",
+    status_code=status.HTTP_200_OK,
+)
+async def post_community_events_send_request_to_service(community_id: int,
+                                                       data: CommunityEventRequestDTO,
+                                                       current_user: Annotated[dict, Depends(get_user_from_token)]):
+    user_id = current_user.get("id")
+
+    headers = {
+        "Content-Type": "application/json",
+    }
+    params = {}
+
+    params["userId"] = user_id
+
+    async with aiohttp.ClientSession() as session:
+        async with session.post(
+            url=f"http://{settings.community_service_settings.base_url}:{settings.community_service_settings.port}/community/{community_id}/events",
+            headers=headers,
+            data=data.model_dump_json(),
+            params=params,
+            ssl=False,
+        ) as response:
+            if response.status == 403:
+                raise HTTPException(
+                    status_code=response.status,
+                    detail="Недостаточно прав"
+                )
+
+            response = await response.json()
+
+            return response
