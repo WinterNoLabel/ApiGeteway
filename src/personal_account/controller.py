@@ -22,7 +22,7 @@ async def send_request_to_profile_service(current_user: Annotated[dict, Depends(
     headers = {"Content-Type": "application/json"}
 
     async with (aiohttp.ClientSession() as session):
-        async with session.get(url=f"http:/{settings.auth_service_settings.base_url}:{settings.auth_service_settings.port}/profile?userID={user_id}",
+        async with session.get(url=f"http://{settings.auth_service_settings.base_url}:{settings.auth_service_settings.port}/profile?userID={user_id}",
                                 headers=headers, ssl=False) as response:
             response = await response.json()
 
