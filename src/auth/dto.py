@@ -6,16 +6,7 @@ from pydantic import BaseModel, Field, field_validator, ValidationError
 
 class AuthRequestDTO(BaseModel):
     username: str = Field(..., description="Уникальный username", examples=["<USERNAME>"])
-    phone_number: str = Field(..., description="Номер телефона пользователя", examples=["+79123456789"])
     password: str = Field(..., description="Пароль (Минимум 6 символов)", min_length=6, examples=["123456"])
-
-    @field_validator('phone_number')
-    def validate_phone_number(cls, v):
-        # Проверка на соответствие формату +7 и наличие 11 цифр
-        if not re.fullmatch(r'^\+7\d{10}$', v):
-            raise HTTPException(detail='Номер телефона должен начинаться с +7 и содержать 11 цифр',
-                                status_code=400)
-        return v
 
 
 class TokensCreateResponseDTO(BaseModel):
