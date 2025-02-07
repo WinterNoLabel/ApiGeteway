@@ -68,7 +68,7 @@ async def send_request_to_profile_service_for_partial_update(current_user: Annot
         form_data.add_field("photo", photo.file, filename=photo.filename, content_type=photo.content_type)
 
     async with aiohttp.ClientSession() as session:
-        async with session.patch(url=f"http://{settings.auth_service_settings.base_url}:{settings.auth_service_settings.port}/profile", data=form_data, ssl=False) as response:
+        async with session.patch(url=f"http://{settings.personal_account_service_settings.base_url}:{settings.personal_account_service_settings.port}/profile", data=form_data, ssl=False) as response:
             if response.status != 200:
                 raise HTTPException(
                     status_code=response.status,

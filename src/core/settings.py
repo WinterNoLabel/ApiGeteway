@@ -22,8 +22,8 @@ class AuthServiceSettings(BaseSettings):
 
 
 class PersonalAccountServiceSettings(BaseSettings):
-    base_url: str = Field(..., validation_alias='AUTH_BASE_URL')
-    port: int = Field(..., validation_alias='AUTH_PORT')
+    base_url: str = Field(..., validation_alias='PA_BASE_URL')
+    port: int = Field(..., validation_alias='PA_PORT')
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding='utf-8', extra='ignore')
 
